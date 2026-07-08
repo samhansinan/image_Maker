@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon & Logo Resizer Studio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Checkerboard background for transparency preview */
+        .checkerboard {
+            background-color: #f0f0f0;
+            background-image: linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+                              linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+                              linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-900">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-emerald-500 to-teal-400 p-2 rounded-xl shadow-lg shadow-emerald-500/20">
+                <i class="fa-solid fa-crop-simple text-slate-950 text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">Logo & Icon Resizer</h1>
+                <p class="text-xs text-slate-400">Perfectly scale and style your brand assets</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">
+                <i class="fa-solid fa-circle text-[8px] mr-1.5 animate-pulse"></i> Jamiah Naleemiah Edition
+            </span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Sidebar - Controls -->
+        <aside class="w-full lg:w-[420px] border-r border-slate-800 bg-slate-950 flex flex-col overflow-y-auto">
+            
+            <!-- Upload Zone -->
+            <div class="p-6 border-b border-slate-900">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Source Asset</h2>
+                <div id="dropzone" class="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 bg-slate-900/50 hover:bg-slate-900 rounded-xl p-5 text-center transition-all cursor-pointer relative group">
+                    <input type="file" id="fileInput" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div class="space-y-2 pointer-events-none">
+                        <div class="w-12 h-12 bg-slate-800 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 rounded-full flex items-center justify-center mx-auto transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                        </div>
+                        <p class="text-sm font-medium text-slate-300">Drag & Drop Logo Here</p>
+                        <p class="text-xs text-slate-500">Supports PNG, JPG, WEBP, SVG</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Demo Option -->
+                <button id="loadDemoBtn" class="mt-3 w-full py-2 px-4 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-emerald-400"></i> Load Sample Logo Structure
+                </button>
+            </div>
+
+            <!-- Configuration Sections -->
+            <div class="p-6 space-y-6">
+                
+                <!-- Size Presets -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Canvas Preset</h2>
+                        <span id="presetLabel" class="text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded">Custom</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setPreset(512, 512, 'App Icon')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                            <span>App Icon <span class="block text-[10px] text-slate-500">512 x 512</span></span>
+                            <i class="fa-solid fa-mobile-screen text-slate-600"></i>
+                        </button>
+                        <button onclick="setPreset(192, 192, 'Web Icon')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                            <span>Web Icon <span class="block text-[10px] text-slate-500">192 x 192</span></span>
+                            <i class="fa-solid fa-globe text-slate-600"></i>
+                        </button>
+                        <button onclick="setPreset(48, 48, 'Favicon')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                            <span>Favicon <span class="block text-[10px] text-slate-500">48 x 48</span></span>
+                            <i class="fa-solid fa-bookmark text-slate-600"></i>
+                        </button>
+                        <button onclick="setPreset(1080, 1080, 'Social Square')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                            <span>Social Square <span class="block text-[10px] text-slate-500">1080 x 1080</span></span>
+                            <i class="fa-brands fa-instagram text-slate-600"></i>
+                        </button>
+                        <button onclick="setPreset(1024, 1024, 'HD Square')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                            <span>HD Square <span class="block text-[10px] text-slate-500">1024 x 1024</span></span>
+                            <i class="fa-solid fa-expand text-slate-600"></i>
+                        </button>
+                    <button onclick="setPreset(1024, 1024, 'App Store')" class="preset-btn py-2 px-3 bg-slate-900 hover:bg-slate-850 rounded-lg text-xs font-medium border border-slate-800 hover:border-slate-700 text-left transition-all flex items-center justify-between">
+                        <span>Store Icon <span class="block text-[10px] text-slate-500">1024 x 1024</span></span>
+                        <i class="fa-solid fa-store text-slate-600"></i>
+                    </button>
+                    </div>
+
+                    <!-- Custom Dimensions -->
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Width (px)</label>
+                            <input type="number" id="customWidth" value="512" min="16" max="3000" class="w-full bg-slate-900 border border-slate-800 rounded-lg py-1.5 px-3 text-sm font-medium focus:outline-none focus:border-emerald-500 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Height (px)</label>
+                            <input type="number" id="customHeight" value="512" min="16" max="3000" class="w-full bg-slate-900 border border-slate-800 rounded-lg py-1.5 px-3 text-sm font-medium focus:outline-none focus:border-emerald-500 text-slate-200">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Positioning & Scale -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Layout & Sizing</h2>
+                    <div class="space-y-4 bg-slate-900/40 p-4 rounded-xl border border-slate-900">
+                        <!-- Zoom -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Scale / Zoom</span>
+                                <span id="zoomVal" class="text-emerald-400 font-medium">100%</span>
+                            </div>
+                            <input type="range" id="zoomSlider" min="5" max="300" value="90" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                        </div>
+                        <!-- Rotation -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Rotation</span>
+                                <span id="rotateVal" class="text-emerald-400 font-medium">0°</span>
+                            </div>
+                            <input type="range" id="rotateSlider" min="0" max="360" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                        </div>
+                        <!-- Padding -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-400">Padding (Inset)</span>
+                                <span id="paddingVal" class="text-emerald-400 font-medium">10%</span>
+                            </div>
+                            <input type="range" id="paddingSlider" min="0" max="50" value="10" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                        </div>
+                        <!-- Manual Offset Controls -->
+                        <div class="pt-2 border-t border-slate-800/60">
+                            <span class="text-[10px] text-slate-500 uppercase font-semibold block mb-2">Manual Alignment</span>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <button onclick="alignImage('center')" class="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs">Center</button>
+                                <button onclick="alignImage('fit')" class="py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs">Fit All</button>
+                                <button onclick="resetAllTransformations()" class="py-1.5 px-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded text-xs">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Styling & Background -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Background & Borders</h2>
+                    <div class="space-y-4 bg-slate-900/40 p-4 rounded-xl border border-slate-900">
+                        
+                        <!-- Background Type Selector -->
+                        <div>
+                            <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-2">Background Fill</label>
+                            <div class="grid grid-cols-3 gap-1 bg-slate-950 p-1 rounded-lg">
+                                <button onclick="setBackgroundType('transparent')" id="bgTypeTransparent" class="bg-type-btn py-1 text-xs font-medium rounded-md transition-all text-emerald-400 bg-slate-900">Transparent</button>
+                                <button onclick="setBackgroundType('solid')" id="bgTypeSolid" class="bg-type-btn py-1 text-xs font-medium rounded-md transition-all text-slate-400">Solid</button>
+                                <button onclick="setBackgroundType('gradient')" id="bgTypeGradient" class="bg-type-btn py-1 text-xs font-medium rounded-md transition-all text-slate-400">Gradient</button>
+                            </div>
+                        </div>
+
+                        <!-- Solid Color Config -->
+                        <div id="solidColorConfig" class="hidden animate-fadeIn">
+                            <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Pick Color</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="bgColorPicker" value="#ffffff" class="w-10 h-8 rounded border-0 cursor-pointer bg-transparent">
+                                <input type="text" id="bgColorText" value="#ffffff" class="flex-1 bg-slate-950 border border-slate-850 rounded-lg py-1 px-3 text-xs text-slate-300">
+                            </div>
+                            <div class="flex gap-1.5 mt-2 overflow-x-auto py-1">
+                                <button onclick="setBgColorQuick('#ffffff')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#ffffff"></button>
+                                <button onclick="setBgColorQuick('#000000')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#000000"></button>
+                                <button onclick="setBgColorQuick('#10b981')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#10b981"></button>
+                                <button onclick="setBgColorQuick('#0284c7')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#0284c7"></button>
+                                <button onclick="setBgColorQuick('#f59e0b')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#f59e0b"></button>
+                                <button onclick="setBgColorQuick('#b91c1c')" class="w-5 h-5 rounded-full border border-slate-700 shrink-0" style="background:#b91c1c"></button>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Config -->
+                        <div id="gradientColorConfig" class="hidden space-y-2 animate-fadeIn">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Start Color</label>
+                                    <input type="color" id="gradStartPicker" value="#059669" class="w-full h-8 rounded border-0 cursor-pointer bg-transparent">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">End Color</label>
+                                    <input type="color" id="gradEndPicker" value="#10b981" class="w-full h-8 rounded border-0 cursor-pointer bg-transparent">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-1">Angle</label>
+                                <input type="range" id="gradAngleSlider" min="0" max="360" value="45" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                            </div>
+                        </div>
+
+                        <!-- Output Corner Styling -->
+                        <div>
+                            <label class="text-[10px] text-slate-500 uppercase font-semibold block mb-2">Mask / Corner Radius</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setCornerType('square')" id="cornerSquare" class="corner-btn py-1.5 px-3 bg-slate-900 border border-emerald-500 text-emerald-400 rounded-lg text-xs font-medium transition-all">Square</button>
+                                <button onclick="setCornerType('rounded')" id="cornerRounded" class="corner-btn py-1.5 px-3 bg-slate-950 border border-slate-850 text-slate-400 rounded-lg text-xs font-medium transition-all">Rounded</button>
+                                <button onclick="setCornerType('circle')" id="cornerCircle" class="corner-btn py-1.5 px-3 bg-slate-950 border border-slate-850 text-slate-400 rounded-lg text-xs font-medium transition-all">Circle</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <section class="flex-1 bg-slate-900 flex flex-col items-center justify-between p-6 relative">
+            
+            <!-- Canvas Frame container -->
+            <div class="flex-1 w-full flex items-center justify-center relative overflow-hidden">
+                <div id="canvasContainer" class="relative max-w-full max-h-full transition-shadow duration-300">
+                    <!-- Checkerboard layer under the canvas inside container to simulate transparency preview -->
+                    <div id="canvasWrapper" class="checkerboard shadow-2xl shadow-black/60 rounded-xl overflow-hidden border border-slate-700/50">
+                        <canvas id="editorCanvas" class="block cursor-move max-w-full max-h-[60vh]"></canvas>
+                    </div>
+                    <!-- Helper Overlay text -->
+                    <div id="canvasOverlay" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-slate-300 text-xs px-3 py-1.5 rounded-full pointer-events-none flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-up-down-left-right text-emerald-400"></i>
+                        <span>Drag inside canvas to position your logo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Bar -->
+            <div class="w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-left">
+                        <p class="text-xs text-slate-400">Output Format</p>
+                        <div class="flex gap-2 mt-1">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="format" value="png" checked class="sr-only peer">
+                                <span class="peer-checked:bg-emerald-500/20 peer-checked:text-emerald-400 peer-checked:border-emerald-500/50 px-3 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-400 font-semibold cursor-pointer transition-all">PNG (Transparent)</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="format" value="jpeg" class="sr-only peer">
+                                <span class="peer-checked:bg-emerald-500/20 peer-checked:text-emerald-400 peer-checked:border-emerald-500/50 px-3 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-400 font-semibold cursor-pointer transition-all">JPEG</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <button id="downloadBtn" class="flex-1 sm:flex-none py-3 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download text-lg"></i>
+                        <span>Export & Download</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Custom Alert/Toast Toast container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+    <!-- Script Block -->
+    <script>
+        // Core state
+        let img = null;
+        let canvas = document.getElementById('editorCanvas');
+        let ctx = canvas.getContext('2d');
+
+        // Layout variables
+        let width = 512;
+        let height = 512;
+        let imageX = 0;
+        let imageY = 0;
+        let scale = 0.9; // default initial scale fits nicely
+        let rotation = 0;
+        let padding = 10; // percent of canvas size
+
+        // Styling variables
+        let bgType = 'transparent'; // 'transparent', 'solid', 'gradient'
+        let bgColor = '#ffffff';
+        let gradStart = '#059669';
+        let gradEnd = '#10b981';
+        let gradAngle = 45;
+        let cornerType = 'square'; // 'square', 'rounded', 'circle'
+
+        // Interaction state
+        let isDragging = false;
+        let startX, startY;
+
+        // UI Selectors
+        const fileInput = document.getElementById('fileInput');
+        const dropzone = document.getElementById('dropzone');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const zoomVal = document.getElementById('zoomVal');
+        const rotateSlider = document.getElementById('rotateSlider');
+        const rotateVal = document.getElementById('rotateVal');
+        const paddingSlider = document.getElementById('paddingSlider');
+        const paddingVal = document.getElementById('paddingVal');
+        const customWidth = document.getElementById('customWidth');
+        const customHeight = document.getElementById('customHeight');
+        const presetLabel = document.getElementById('presetLabel');
+
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const bgColorText = document.getElementById('bgColorText');
+        const gradStartPicker = document.getElementById('gradStartPicker');
+        const gradEndPicker = document.getElementById('gradEndPicker');
+        const gradAngleSlider = document.getElementById('gradAngleSlider');
+
+        const solidColorConfig = document.getElementById('solidColorConfig');
+        const gradientColorConfig = document.getElementById('gradientColorConfig');
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initCanvas();
+            setupEventListeners();
+            loadDemoLogo(); // Load a vector representation of the Naleemiah architecture shape if no user image uploaded
+        });
+
+        function initCanvas() {
+            canvas.width = width;
+            canvas.height = height;
+            draw();
+        }
+
+        function setupEventListeners() {
+            // Dropzone & Input file upload
+            fileInput.addEventListener('change', handleFileSelect);
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-emerald-500');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-emerald-500');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-emerald-500');
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect();
+                }
+            });
+
+            // Demo logo load
+            document.getElementById('loadDemoBtn').addEventListener('click', loadDemoLogo);
+
+            // Slider listeners
+            zoomSlider.addEventListener('input', (e) => {
+                scale = e.target.value / 100;
+                zoomVal.textContent = e.target.value + '%';
+                draw();
+            });
+
+            rotateSlider.addEventListener('input', (e) => {
+                rotation = parseInt(e.target.value);
+                rotateVal.textContent = rotation + '°';
+                draw();
+            });
+
+            paddingSlider.addEventListener('input', (e) => {
+                padding = parseInt(e.target.value);
+                paddingVal.textContent = padding + '%';
+                draw();
+            });
+
+            // Dimension Inputs
+            customWidth.addEventListener('change', (e) => {
+                width = Math.max(16, Math.min(3000, parseInt(e.target.value) || 512));
+                canvas.width = width;
+                presetLabel.textContent = 'Custom';
+                draw();
+            });
+            customHeight.addEventListener('change', (e) => {
+                height = Math.max(16, Math.min(3000, parseInt(e.target.value) || 512));
+                canvas.height = height;
+                presetLabel.textContent = 'Custom';
+                draw();
+            });
+
+            // Color inputs
+            bgColorPicker.addEventListener('input', (e) => {
+                bgColor = e.target.value;
+                bgColorText.value = bgColor;
+                draw();
+            });
+            bgColorText.addEventListener('input', (e) => {
+                if(/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                    bgColor = e.target.value;
+                    bgColorPicker.value = bgColor;
+                    draw();
+                }
+            });
+            gradStartPicker.addEventListener('input', (e) => {
+                gradStart = e.target.value;
+                draw();
+            });
+            gradEndPicker.addEventListener('input', (e) => {
+                gradEnd = e.target.value;
+                draw();
+            });
+            gradAngleSlider.addEventListener('input', (e) => {
+                gradAngle = parseInt(e.target.value);
+                draw();
+            });
+
+            // Interactive Dragging on Canvas
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', drag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
+
+            // Touch support for mobile dragging
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    startDrag(e.touches[0]);
+                }
+            }, { passive: true });
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) {
+                    drag(e.touches[0]);
+                }
+            }, { passive: true });
+            canvas.addEventListener('touchend', endDrag);
+
+            // Download trigger
+            document.getElementById('downloadBtn').addEventListener('click', downloadImage);
+        }
+
+        // Draw logic
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+
+            // 1. Clip Border/Corner style mask onto the output canvas itself
+            if (cornerType === 'rounded') {
+                const radius = Math.min(width, height) * 0.12; // 12% corner radius
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(width - radius, 0);
+                ctx.quadraticCurveTo(width, 0, width, radius);
+                ctx.lineTo(width, height - radius);
+                ctx.quadraticCurveTo(width, height, width - radius, height);
+                ctx.lineTo(radius, height);
+                ctx.quadraticCurveTo(0, height, 0, height - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.clip();
+            } else if (cornerType === 'circle') {
+                ctx.beginPath();
+                ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+            }
+
+            // 2. Draw Background
+            if (bgType === 'solid') {
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, width, height);
+            } else if (bgType === 'gradient') {
+                // Generate gradient based on angle
+                const angleRad = (gradAngle * Math.PI) / 180;
+                const r = Math.sqrt(width * width + height * height) / 2;
+                const x1 = width / 2 - Math.cos(angleRad) * r;
+                const y1 = height / 2 - Math.sin(angleRad) * r;
+                const x2 = width / 2 + Math.cos(angleRad) * r;
+                const y2 = height / 2 + Math.sin(angleRad) * r;
+
+                let grad = ctx.createLinearGradient(x1, y1, x2, y2);
+                grad.addColorStop(0, gradStart);
+                grad.addColorStop(1, gradEnd);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                // Transparent: Keep clear
+            }
+
+            // 3. Draw active Image
+            if (img) {
+                ctx.save();
+                
+                // Set alignment origin to center of canvas
+                ctx.translate(width / 2 + imageX, height / 2 + imageY);
+                ctx.rotate((rotation * Math.PI) / 180);
+
+                // Calculate padding constraints
+                const padPixels = (padding / 100) * Math.min(width, height);
+                const maxWidth = width - padPixels * 2;
+                const maxHeight = height - padPixels * 2;
+
+                // Determine base sizing ratio
+                const imgRatio = img.width / img.height;
+                const canvasRatio = maxWidth / maxHeight;
+                
+                let renderWidth, renderHeight;
+                if (imgRatio > canvasRatio) {
+                    renderWidth = maxWidth;
+                    renderHeight = maxWidth / imgRatio;
+                } else {
+                    renderHeight = maxHeight;
+                    renderWidth = maxHeight * imgRatio;
+                }
+
+                // Apply dynamic zoom scale
+                const finalW = renderWidth * scale;
+                const finalH = renderHeight * scale;
+
+                // Render the image centered on rotation origin
+                ctx.drawImage(img, -finalW / 2, -finalH / 2, finalW, finalH);
+                ctx.restore();
+            } else {
+                // No image loaded placeholder message inside canvas
+                ctx.fillStyle = "rgba(0,0,0,0.4)";
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 16px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No Image Loaded", width / 2, height / 2 - 10);
+                ctx.font = "12px sans-serif";
+                ctx.fillStyle = "#94a3b8";
+                ctx.fillText("Upload or click 'Load Sample' to begin", width / 2, height / 2 + 15);
+            }
+
+            ctx.restore();
+        }
+
+        // File handling
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    img = tempImg;
+                    resetAllTransformations();
+                    showToast("Success", "Logo uploaded successfully!", "success");
+                };
+                tempImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Generate vector simulation of the logo as a placeholder
+        function loadDemoLogo() {
+            // Build simple vector illustration representing Jamiah Naleemiah logo shape/elements inside image
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 500;
+            tempCanvas.height = 500;
+            const tCtx = tempCanvas.getContext('2d');
+
+            // Draw a styled mosque dome / crest layout as an exquisite fallback asset
+            tCtx.clearRect(0,0,500,500);
+            
+            // Outer golden crescent ring
+            tCtx.beginPath();
+            tCtx.arc(250, 260, 180, 0, Math.PI, false);
+            tCtx.strokeStyle = '#d97706';
+            tCtx.lineWidth = 14;
+            tCtx.stroke();
+
+            // Inner Dome structure
+            tCtx.fillStyle = '#059669';
+            tCtx.beginPath();
+            tCtx.arc(250, 240, 90, Math.PI, 0, false);
+            tCtx.fill();
+            
+            // Base brickwork
+            tCtx.fillStyle = '#b91c1c';
+            tCtx.fillRect(160, 240, 180, 30);
+            tCtx.fillStyle = '#ffffff';
+            tCtx.font = 'bold 14px Georgia';
+            tCtx.fillText("J A M I A H", 218, 258);
+
+            // Minaret tower side representation
+            tCtx.fillStyle = '#64748b';
+            tCtx.fillRect(320, 130, 25, 110);
+            tCtx.fillStyle = '#475569';
+            tCtx.fillRect(315, 115, 35, 15);
+
+            // Set as image source
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                img = tempImg;
+                resetAllTransformations();
+                showToast("Demo Loaded", "Loaded interactive sample branding asset.", "info");
+            };
+            tempImg.src = tempCanvas.toDataURL();
+        }
+
+        // Presets control
+        function setPreset(w, h, name) {
+            width = w;
+            height = h;
+            customWidth.value = w;
+            customHeight.value = h;
+            canvas.width = w;
+            canvas.height = h;
+            presetLabel.textContent = name;
+            
+            // Update active styling on preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-500', 'bg-emerald-500/5');
+            });
+            event.currentTarget.classList.add('border-emerald-500', 'bg-emerald-500/5');
+            
+            draw();
+            showToast("Preset Changed", `Canvas configured to ${w}x${h} (${name})`, "info");
+        }
+
+        // Direct Drag-to-Position on Canvas logic
+        function startDrag(e) {
+            // Get correct event coords for either desktop or mobile
+            const clientX = e.clientX || e.pageX;
+            const clientY = e.clientY || e.pageY;
+            
+            // Offset coordinates on canvas wrapper
+            const rect = canvas.getBoundingClientRect();
+            startX = clientX - rect.left;
+            startY = clientY - rect.top;
+            
+            isDragging = true;
+        }
+
+        function drag(e) {
+            if (!isDragging || !img) return;
+            const clientX = e.clientX || e.pageX;
+            const clientY = e.clientY || e.pageY;
+            
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = clientX - rect.left;
+            const mouseY = clientY - rect.top;
+
+            // Difference in mouse movement converted to relative canvas coordinate scale
+            const dx = (mouseX - startX) * (width / rect.width);
+            const dy = (mouseY - startY) * (height / rect.height);
+
+            imageX += dx;
+            imageY += dy;
+
+            startX = mouseX;
+            startY = mouseY;
+
+            draw();
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        // Align helper presets
+        function alignImage(mode) {
+            if (!img) return;
+            if (mode === 'center') {
+                imageX = 0;
+                imageY = 0;
+            } else if (mode === 'fit') {
+                imageX = 0;
+                imageY = 0;
+                scale = 1.0;
+                zoomSlider.value = 100;
+                zoomVal.textContent = "100%";
+                paddingSlider.value = 0;
+                paddingVal.textContent = "0%";
+                padding = 0;
+            }
+            draw();
+        }
+
+        function resetAllTransformations() {
+            imageX = 0;
+            imageY = 0;
+            scale = 0.9;
+            rotation = 0;
+            padding = 10;
+            
+            zoomSlider.value = 90;
+            zoomVal.textContent = "90%";
+            rotateSlider.value = 0;
+            rotateVal.textContent = "0°";
+            paddingSlider.value = 10;
+            paddingVal.textContent = "10%";
+            
+            draw();
+        }
+
+        // Style triggers
+        function setBackgroundType(type) {
+            bgType = type;
+            
+            // Toggle visual tab highlight
+            document.querySelectorAll('.bg-type-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-emerald-400');
+                btn.classList.add('text-slate-400');
+            });
+            
+            if (type === 'transparent') {
+                document.getElementById('bgTypeTransparent').classList.add('bg-slate-900', 'text-emerald-400');
+                solidColorConfig.classList.add('hidden');
+                gradientColorConfig.classList.add('hidden');
+            } else if (type === 'solid') {
+                document.getElementById('bgTypeSolid').classList.add('bg-slate-900', 'text-emerald-400');
+                solidColorConfig.classList.remove('hidden');
+                gradientColorConfig.classList.add('hidden');
+            } else {
+                document.getElementById('bgTypeGradient').classList.add('bg-slate-900', 'text-emerald-400');
+                solidColorConfig.classList.add('hidden');
+                gradientColorConfig.classList.remove('hidden');
+            }
+            draw();
+        }
+
+        function setBgColorQuick(hex) {
+            bgColor = hex;
+            bgColorPicker.value = hex;
+            bgColorText.value = hex;
+            draw();
+        }
+
+        function setCornerType(type) {
+            cornerType = type;
+            document.querySelectorAll('.corner-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-500', 'text-emerald-400', 'bg-slate-900');
+                btn.classList.add('border-slate-850', 'text-slate-400', 'bg-slate-950');
+            });
+            
+            const activeId = 'corner' + type.charAt(0).toUpperCase() + type.slice(1);
+            document.getElementById(activeId).classList.add('border-emerald-500', 'text-emerald-400', 'bg-slate-900');
+            
+            draw();
+        }
+
+        // Handle Download / Export
+        function downloadImage() {
+            if (!img) {
+                showToast("Cannot Export", "Please upload a logo first", "error");
+                return;
+            }
+
+            const format = document.querySelector('input[name="format"]:checked').value;
+            const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+            const extension = format === 'png' ? '.png' : '.jpg';
+            
+            // Force redraw step to ensure absolute latest updates are printed
+            draw();
+
+            // Trigger standard secure frame sandbox-safe anchor download trick
+            const imageURL = canvas.toDataURL(mimeType, 0.95);
+            const link = document.createElement('a');
+            link.download = `Naleemiah_Logo_Adjusted_${width}x${height}${extension}`;
+            link.href = imageURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Export Complete", "Your customized asset is ready!", "success");
+        }
+
+        // Custom UI Toasts
+        function showToast(title, msg, type = "info") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `p-4 rounded-xl shadow-lg border text-xs font-semibold flex items-start gap-3 w-72 animate-slideIn transition-all duration-300 bg-slate-950/95 backdrop-blur-md ${
+                type === 'success' ? 'border-emerald-500/20 text-emerald-300' :
+                type === 'error' ? 'border-rose-500/20 text-rose-300' :
+                'border-slate-800 text-slate-300'
+            }`;
+
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' :
+                         type === 'error' ? 'fa-circle-exclamation text-rose-400' :
+                         'fa-info-circle text-sky-400';
+
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} text-lg mt-0.5"></i>
+                <div>
+                    <h4 class="font-bold mb-0.5 text-slate-100">${title}</h4>
+                    <p class="text-slate-400 font-normal">${msg}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-12');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
