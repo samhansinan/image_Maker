@@ -777,7 +777,7 @@
             // Trigger standard secure frame sandbox-safe anchor download trick
             const imageURL = canvas.toDataURL(mimeType, 0.95);
             const link = document.createElement('a');
-            link.download = `Naleemiah_Logo_Adjusted_${width}x${height}${extension}`;
+            link.download = `Logo_Adjusted_${width}x${height}${extension}`;
             link.href = imageURL;
             document.body.appendChild(link);
             link.click();
